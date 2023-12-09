@@ -1,10 +1,7 @@
 import {
   BadRequestException,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
-  ParseUUIDPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -24,16 +21,15 @@ export class UserService {
         throw new BadRequestException('User already exists')
     }
     
-    const u = new this.userModel({
+    const newUser = new this.userModel({
       ...user,
       password: user.password
         ? await this.hashPassword(user.password)
         : undefined,
     });
 
-    u.save()
-    const allUsers = await this.userModel.find();
-    return u;
+    newUser.save()
+    return newUser;
   }
 
   private async hashPassword(password: string) {

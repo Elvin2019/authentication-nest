@@ -6,7 +6,7 @@ import { User } from 'src/user/user.schema';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-export interface  StorePayload {
+export interface  UserPayload {
   login: string;
   sub: string;
 }
@@ -31,8 +31,7 @@ export class AuthService {
       throw new HttpException('Incorrect Login', HttpStatus.UNAUTHORIZED);
     }
 
-    const now = new Date();
-    const payload: StorePayload = { login: user.email, sub: user.id };
+    const payload: UserPayload = { login: user.email, sub: user.id };
     delete user.password;
     
     const token = await this.jwtService.signAsync(payload, {
@@ -49,7 +48,7 @@ export class AuthService {
   }
 
   public async logout() {
-    
+  
     return {
       statusCode: HttpStatus.OK,
     };
