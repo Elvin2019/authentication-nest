@@ -1,0 +1,30 @@
+# Use root/example as user/password credentials
+version: '3.1'
+services:
+  server:
+    container_name: server
+    networks:
+      - app-network
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      NODE_ENV: production
+    ports:
+      - 4001:4001
+    stdin_open: true
+
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    ports:
+      - 27017:27017
+
+networks:
+  app-network:
+    name: global
+    external: true
+    
