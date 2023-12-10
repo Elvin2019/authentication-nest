@@ -28,6 +28,6 @@ export class AuthController {
   @Post('logout')
   async logout(@Headers() headers) {
     const token = headers.authorization.split(' ')[1];
-    return  await this.authService.logout();
+    return  await this.authService.logout(token);
   }
 }

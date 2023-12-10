@@ -1,13 +1,24 @@
-import { ExecutionContext, Injectable, UnauthorizedException, SetMetadata } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+  SetMetadata,
+  Inject,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
-  constructor(private reflector: Reflector) {
+  constructor(
+    private reflector: Reflector,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {
     super();
   }
-  canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext): Promise<boolean> {
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -15,7 +26,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (isPublic) {
       return true;
     }
-    return super.canActivate(context);
+
+    const request = context.switchToHttp().getRequest();
+    const token = request.headers.authorization.split(' ')[1];
+    const isBlackListedToken = await this.cacheManager.get(token);
+    if (isBlackListedToken) {
+      return false;
+    }
+    return super.canActivate(context) as boolean;
   }
 
   handleRequest(err, user /* info */) {

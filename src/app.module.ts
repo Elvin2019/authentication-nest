@@ -11,6 +11,9 @@ import { TerminusModule } from '@nestjs/terminus';
 import { HealthController } from './health/health.controller';
 import { HttpModule } from '@nestjs/axios';
 import { LoggerModule } from 'nestjs-pino';
+import type { RedisClientOptions } from 'redis';
+import { CacheModule } from '@nestjs/cache-manager';
+import { redisStore } from 'cache-manager-redis-yet';
 
 @Module({
   imports: [
@@ -37,12 +40,22 @@ import { LoggerModule } from 'nestjs-pino';
               level: 'info',
               options: {
                 uri: 'mongodb://root:example@localhost:27017/',
-                database: 'logs',
-                collection: 'log-collection',
+                database: 'auth',
+                collection: 'logs',
               },
             },
           ],
         },
+      },
+    }),
+    CacheModule.register<RedisClientOptions>({
+      store: redisStore,
+      // username: process.env.REDIS_USER,
+      password: process.env.REDIS_PASSWORD,
+      isGlobal: true,
+      socket: {
+        host: process.env.REDIS_HOST ?? 'localhost',
+        port: parseInt(process.env.REDIS_PORT ?? '6379'),
       },
     }),
     TerminusModule,
