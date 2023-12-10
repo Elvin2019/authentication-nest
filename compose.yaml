@@ -2,6 +2,8 @@
 version: '3.1'
 services:
   server:
+    env_file:
+      - .env
     container_name: server
     networks:
       - app-network
@@ -15,32 +17,34 @@ services:
     stdin_open: true
 
   mongo:
+    env_file:
+      - .env
+    networks:
+      - app-network
     image: mongo
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
     ports:
       - 27017:27017
 
   redis:
+    env_file:
+      - .env
+    networks:
+      - app-network
     image: redis:latest
     ports:
       - 6379:6379
-    # volumes:
-    #   - /path/to/local/dаta:/root/redis
-    #   - /path/to/local/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
-    #  REDIS_USERNAME: root
-     REDIS_PASSWORD: my-password
-     REDIS_PORT: 6379
-     REDIS_DATABASES: 16  
-    command: /bin/sh -c 'redis-server --appendonly yes --requirepass $${REDIS_PASSWORD}'
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_PORT: 6379
+      REDIS_DATABASES: 16
+    command: /bin/sh -c 'redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}'
     restart: always
- 
 
 networks:
   app-network:
     name: global
     external: true
-    
