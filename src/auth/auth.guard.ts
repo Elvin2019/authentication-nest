@@ -26,9 +26,12 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (isPublic) {
       return true;
     }
-
+    
     const request = context.switchToHttp().getRequest();
-    const token = request.headers.authorization.split(' ')[1];
+    const token = request.headers?.authorization?.split(' ')[1];
+    if(!token) {
+      throw new UnauthorizedException();
+    }
     const isBlackListedToken = await this.cacheManager.get(token);
     if (isBlackListedToken) {
       return false;
