@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Post, Headers, Logger } from '@nestjs/common';
+import { Body, Controller, HttpStatus, Post, Headers, Logger, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiOkResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { LoginDto, LoginErrorResponseDto } from './auth.dto';
@@ -24,6 +24,11 @@ export class AuthController {
     return await this.authService.login(loginDto.email, loginDto.password);
   }
 
+  @Get('me')
+  async me(@Headers() headers) {
+    const token = headers.authorization.split(' ')[1];
+    return await this.authService.me(token);
+  }
 
   @Post('logout')
   async logout(@Headers() headers) {

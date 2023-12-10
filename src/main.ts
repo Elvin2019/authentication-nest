@@ -9,6 +9,8 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
   app.useLogger(app.get(Logger));
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
+  app.enableCors()
+
   const options = new DocumentBuilder()
     .setTitle('API')
     .setDescription('Authentication system')

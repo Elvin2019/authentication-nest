@@ -49,10 +49,22 @@ export class AuthService {
       statusCode: HttpStatus.OK,
     };
   }
+
+  
+  public async me(token: string) {
+    const data = this.jwtService.decode(token);
+    const id = data.sub;
+    const user = await this.userModel.findById(id).lean();
+    delete user.password;
+    return user;
+  }
   public async logout(token: string) {
     await this.cacheManager.set(token, true, 60 * 60 * 1000);
     return {
       statusCode: HttpStatus.OK,
+      response: {
+        message: 'Logout success',
+      }
     };
   }
 }

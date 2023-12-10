@@ -29,6 +29,7 @@ export class UserService {
     });
 
     newUser.save()
+    delete newUser.password;
     return newUser;
   }
 
